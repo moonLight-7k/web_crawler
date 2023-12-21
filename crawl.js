@@ -2,18 +2,30 @@ const { JSDOM } = require("jsdom");
 const fetch = require("node-fetch"); // Import node-fetch
 
 async function crawlPage(currentURL) {
-  console.log(`Crawling ${currentURL}`);
+  console.log(`⚡ Crawling ${currentURL}`);
 
   try {
     const resp = await fetch(currentURL);
+    const contentType = resp.headers.get("content-type");
+    if (!contentType.includes("text/html")) {
+      console.log(
+        `No HTML response,\n content-type:${contentType},\n on-page: ${currentURL}\n`,
+      );
+      return;
+    }
     if (!resp.ok) {
-      throw new Error(`Failed to fetch ${currentURL}, status: ${resp.status}`);
+      throw new Error(
+        `× Failed to fetch ${currentURL},\n status: ${resp.status}\n`,
+      );
+
+      return;
     }
 
-    const htmlBody = await resp.text(); // Use await to get the text content
+    const htmlBody = await resp.text(); // Using await to get the text content
     console.log(htmlBody);
+    console.log("✓ Crawling completed.");
   } catch (error) {
-    console.error(`Error fetching ${currentURL}: ${error.message}`);
+    console.error(`𐄂 Error fetching ${currentURL}: ${error.message}\n`);
   }
 }
 
@@ -57,5 +69,5 @@ function normalizeURL(urlString) {
 module.exports = {
   normalizeURL,
   getURLsFromHTML,
-  crawlPage, // Export the crawlPage function
+  crawlPage,
 };

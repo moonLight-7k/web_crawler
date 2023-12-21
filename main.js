@@ -2,7 +2,7 @@ const { crawlPage } = require("./crawl.js");
 
 async function main() {
   if (process.argv.length !== 3) {
-    console.error("Usage: node main.js <website>");
+    console.error("ⅹ Usage: node main.js <website>");
     process.exit(1);
   }
 
@@ -10,11 +10,7 @@ async function main() {
 
   console.log(`✓ Starting crawler for ${baseUrl}....`);
 
-  // Call the crawlPage function with the provided baseUrl
   await crawlPage(baseUrl);
-
-  console.log("✓ Crawling completed.");
 }
 
-// Run the main function
 main();
