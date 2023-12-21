@@ -1,35 +1,56 @@
 const { JSDOM } = require("jsdom");
 const fetch = require("node-fetch"); // Import node-fetch
 
-async function crawlPage(currentURL) {
+async function crawlPage(baseURL, currentURL, visitedPages = {}) {
+  const baseURLObj = new URL(baseURL);
+  const currentURLObj = new URL(currentURL);
+
+  if (baseURLObj.hostname !== currentURLObj.hostname) {
+    return visitedPages;
+  }
+
+  const normalizedCurrentURL = normalizeURL(currentURL);
+  if (visitedPages[normalizedCurrentURL] > 0) {
+    visitedPages[normalizedCurrentURL]++;
+    return visitedPages;
+  }
+  visitedPages[normalizedCurrentURL] = 1;
+
   console.log(`⚡ Crawling ${currentURL}`);
 
   try {
     const resp = await fetch(currentURL);
     const contentType = resp.headers.get("content-type");
+
     if (!contentType.includes("text/html")) {
       console.log(
-        `No HTML response,\n content-type:${contentType},\n on-page: ${currentURL}\n`,
+        `No HTML response,\n content-type:${contentType},\n on-page: ${currentURL}\n`
       );
-      return;
+      return visitedPages;
     }
+
     if (!resp.ok) {
       throw new Error(
-        `× Failed to fetch ${currentURL},\n status: ${resp.status}\n`,
+        `× Failed to fetch ${currentURL},\n status: ${resp.status}\n`
       );
-
-      return;
     }
 
     const htmlBody = await resp.text(); // Using await to get the text content
-    console.log(htmlBody);
+    const nextURLs = getURLsFromHTML(htmlBody, baseURL);
+
+    for (const nextURL of nextURLs) {
+      visitedPages = await crawlPage(baseURL, nextURL, visitedPages);
+    }
+
     console.log("✓ Crawling completed.");
   } catch (error) {
-    console.error(`𐄂 Error fetching ${currentURL}: ${error.message}\n`);
+    throw new Error(`𐄂 Error fetching ${currentURL}: ${error.message}\n`);
   }
+
+  return visitedPages;
 }
 
-function getURLsFromHTML(htmlBody, baseUrl) {
+function getURLsFromHTML(htmlBody, baseURL) {
   const urls = [];
 
   const dom = new JSDOM(htmlBody);
@@ -39,10 +60,10 @@ function getURLsFromHTML(htmlBody, baseUrl) {
     if (linkElement.href.slice(0, 1) === "/") {
       // It's a relative URL
       try {
-        const urlObj = new URL(`${baseUrl}${linkElement.href}`);
+        const urlObj = new URL(`${baseURL}${linkElement.href}`);
         urls.push(urlObj.href);
       } catch (err) {
-        console.log(`Error with relative URL: ${err.message}`);
+        console.error(`Error with relative URL: ${err.message}`);
       }
     } else {
       // It's an absolute URL
@@ -50,10 +71,11 @@ function getURLsFromHTML(htmlBody, baseUrl) {
         const urlObj = new URL(linkElement.href);
         urls.push(urlObj.href);
       } catch (err) {
-        console.log(`Error with absolute URL: ${err.message}`);
+        console.error(`Error with absolute URL: ${err.message}`);
       }
     }
   }
+
   return urls;
 }
 

@@ -10,7 +10,10 @@ async function main() {
 
   console.log(`✓ Starting crawler for ${baseUrl}....`);
 
-  await crawlPage(baseUrl);
+  const pages = await crawlPage(baseUrl, baseUrl, {});
+  for (const page of Object.entries(pages)) {
+    console.log(page);
+  }
 }
 
 main();
