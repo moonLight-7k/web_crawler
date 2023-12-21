@@ -1,6 +1,6 @@
 {
   "name": "web_crawler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A Web crawler written in JS",
   "main": "index.js",
   "scripts": {
