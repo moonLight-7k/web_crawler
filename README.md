@@ -1,4 +1,4 @@
-# Web_Miner
+# Web Miner
 
 ## Overview
 
@@ -32,25 +32,21 @@ The Web Miner is a versatile JavaScript tool designed to fetch data from website
 ## Getting Started
 
 ### Installation
+#### Clone the repo:
+(Note: [Node.js](https://nodejs.org/en) should be installed )
 
 ````bash
-npm install tagfetcher-crawler
+git clone https://github.com/moonLight-7k/web_crawler.git
+````
 
+#### Usage
 
-## Table of Contents
+##### to crawl the site
+````bash
+node main.js <website>
+````
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Examples](#examples)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
-
-Provide step-by-step instructions on how to install your crawler.
-
-```bash
-# Example installation commands or requirements.txt
-pip install your-crawler
+##### to see help
+````bash
+node main.js help
 ````
