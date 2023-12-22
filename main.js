@@ -8,16 +8,10 @@ async function main() {
 
   const baseUrl = process.argv[2];
 
-  //  TODO: ========|Experimental Feature|=======
-  // const targetTag = process.argv[3];
-  // if (targetTag == "Text" || targetTag == "text") {
-  //   console.log("✓ ======Getting Text======");
-  // }
-
   console.log(`✓ Starting crawler for ${baseUrl}....\n`);
 
   try {
-    const pages = await crawlPage(baseUrl, baseUrl, {},'./data.txt');
+    const pages = await crawlPage(baseUrl, baseUrl, {});
     for (const [page, count] of Object.entries(pages)) {
       console.log(`${page}: ${count} visits`);
     }
