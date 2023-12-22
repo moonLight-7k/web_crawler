@@ -1,14 +1,25 @@
 const { JSDOM } = require("jsdom");
 const fetch = require("node-fetch");
+const path = require("path");
 const fs = require("fs").promises;
+const puppeteer = require("puppeteer");
+
+// List of common user-agents
+const userAgents = [
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36",
+  "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0",
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/82.0.4227.42 ",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/97.0.1072.76",
+  // ... add more user-agents
+];
+
+const delayMs = 2000; // Delay between requests in milliseconds
+let n = 0;
 
 // Function to crawl a page and return a dictionary of visited pages.
-async function crawlPage(
-  baseURL,
-  currentURL,
-  visitedPages = {},
-  outputFilePath
-) {
+async function crawlPage(baseURL, currentURL, visitedPages = {}) {
   const baseURLObj = new URL(baseURL);
   const currentURLObj = new URL(currentURL);
 
@@ -26,33 +37,24 @@ async function crawlPage(
   console.log(`⚡ Crawling ${currentURL}`);
 
   try {
-    const resp = await fetch(currentURL);
-    const contentType = resp.headers.get("content-type");
+    const htmlBody = await fetchWithPuppeteer(currentURL); // Use Puppeteer for fetching
 
-    // Not HTML
-    if (!contentType.includes("text/html")) {
-      console.log(
-        `No HTML response,\n content-type:${contentType},\n on-page: ${currentURL}\n`
-      );
-      return visitedPages;
-    }
+    // =====To get info for specific tag from the site=====
 
-    // Not OK
-    if (!resp.ok) {
-      throw new Error(
-        `× Failed to fetch ${currentURL},\n status: ${resp.status}\n`
-      );
-    }
-    console.log("✓ Crawling completed. \n");
+    // const extractedContent = extractTextFromTags(htmlBody, [
+    //   "h1",
+    //   "h2",
+    //   "h3",
+    //   "h4",
+    //   "h5",
+    //   "p",
+    //   "a",
+    //   "div",
+    //   "span",
+    // ]);
 
-    const htmlBody = await resp.text(); // Using await to get the text content
-    const extractedContent = extractTextFromTags(htmlBody, [
-      "h1",
-      "h2",
-      "h3",
-      "p",
-    ]);
-    await saveToFile(outputFilePath, extractedContent);
+    const allURLs = getURLsFromHTML(htmlBody, baseURL);
+    await saveToFile(`./data/${baseURLObj.hostname}_${n++}.text`, allURLs);
 
     const nextURLs = getURLsFromHTML(htmlBody, baseURL); // Get all URLs from the HTML body
 
@@ -112,7 +114,7 @@ function normalizeURL(urlString) {
 // Function to save content to a file
 async function saveToFile(filePath, content) {
   try {
-    await fs.writeFile(filePath, content, "utf-8"); // Specify encoding as 'utf-8'
+    await fs.appendFile(filePath, content, "utf-8"); // Specify encoding as 'utf-8'
     console.log(`✓ Content saved to ${filePath}`);
   } catch (error) {
     console.error(`𐄂 Error saving to file ${filePath}: ${error.message}\n`);
@@ -132,6 +134,42 @@ function extractTextFromTags(htmlBody, tags) {
   });
 
   return extractedText;
+}
+
+async function fetchWithRetry(url) {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  await page.setUserAgent(getRandomUserAgent());
+  await page.goto(url);
+
+  const content = await page.content();
+
+  await browser.close();
+  return content;
+}
+
+async function fetchWithPuppeteer(url) {
+  const browser = await puppeteer.launch({
+    headless: "new",
+  });
+
+  const page = await browser.newPage();
+  await page.setUserAgent("Your User Agent String");
+  await page.goto(url);
+
+  const content = await page.content();
+
+  await browser.close();
+  return content;
+}
+
+function getRandomUserAgent() {
+  return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
+
+async function delay(milliseconds) {
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 module.exports = {
