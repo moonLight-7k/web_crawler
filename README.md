@@ -1,4 +1,4 @@
-# Web Miner
+# ⛏️ Web Miner
 
 ## Overview
 
