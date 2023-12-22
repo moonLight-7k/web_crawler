@@ -12,10 +12,8 @@ const userAgents = [
   "Mozilla/5.0 (Macintosh; Intel Mac OS X x.y; rv:42.0) Gecko/20100101 Firefox/42.0",
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 OPR/82.0.4227.42 ",
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/97.0.1072.76",
-  // ... add more user-agents
 ];
 
-const delayMs = 2000; // Delay between requests in milliseconds
 let n = 0;
 
 // Function to crawl a page and return a dictionary of visited pages.
@@ -54,7 +52,7 @@ async function crawlPage(baseURL, currentURL, visitedPages = {}) {
     // ]);
 
     const allURLs = getURLsFromHTML(htmlBody, baseURL);
-    await saveToFile(`./data/${baseURLObj.hostname}_${n++}.text`, allURLs);
+    await saveToFile(`./data/${baseURLObj.hostname}_${n++}.txt`, allURLs);
 
     const nextURLs = getURLsFromHTML(htmlBody, baseURL); // Get all URLs from the HTML body
 
@@ -121,7 +119,7 @@ async function saveToFile(filePath, content) {
   }
 }
 
-// Function to extract text from specified HTML tags
+// TODO: Function to extract text from specified HTML tags (Feature)
 function extractTextFromTags(htmlBody, tags) {
   const dom = new JSDOM(htmlBody);
   let extractedText = "";
@@ -136,26 +134,14 @@ function extractTextFromTags(htmlBody, tags) {
   return extractedText;
 }
 
-async function fetchWithRetry(url) {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-
-  await page.setUserAgent(getRandomUserAgent());
-  await page.goto(url);
-
-  const content = await page.content();
-
-  await browser.close();
-  return content;
-}
-
+// headless browser function
 async function fetchWithPuppeteer(url) {
   const browser = await puppeteer.launch({
     headless: "new",
   });
 
   const page = await browser.newPage();
-  await page.setUserAgent("Your User Agent String");
+  await page.setUserAgent(getRandomUserAgent());
   await page.goto(url);
 
   const content = await page.content();
@@ -166,10 +152,6 @@ async function fetchWithPuppeteer(url) {
 
 function getRandomUserAgent() {
   return userAgents[Math.floor(Math.random() * userAgents.length)];
-}
-
-async function delay(milliseconds) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
 module.exports = {
