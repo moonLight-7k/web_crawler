@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "jsdom": "^23.0.1",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "puppeteer": "^21.6.1"
   }
 }
