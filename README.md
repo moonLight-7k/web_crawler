@@ -41,12 +41,13 @@ git clone https://github.com/moonLight-7k/web_crawler.git
 
 #### Usage
 
-##### to crawl the site
+##### crawl the site
 ````bash
 node main.js <website>
 ````
 
-##### to see help
+##### see help
+
 ````bash
 node main.js help
 ````
