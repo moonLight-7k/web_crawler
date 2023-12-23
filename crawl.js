@@ -52,7 +52,7 @@ async function crawlPage(baseURL, currentURL, visitedPages = {}) {
     // ]);
 
     const allURLs = getURLsFromHTML(htmlBody, baseURL);
-    await saveToFile(`./data/${baseURLObj.hostname}_${n++}.txt`, allURLs);
+    await saveToJsonFile(`./data/${baseURLObj.hostname}_${n++}.json`, allURLs);
 
     const nextURLs = getURLsFromHTML(htmlBody, baseURL); // Get all URLs from the HTML body
 
@@ -148,6 +148,17 @@ async function fetchWithPuppeteer(url) {
 
   await browser.close();
   return content;
+}
+
+// Function to save URLs to a JSON file
+async function saveToJsonFile(filePath, urls) {
+  try {
+    const jsonData = JSON.stringify(urls, null, 2);
+    await fs.writeFile(filePath, jsonData, "utf-8");
+    console.log(`✓ URLs saved to ${filePath}`);
+  } catch (error) {
+    console.error(`𐄂 Error saving to file ${filePath}: ${error.message}\n`);
+  }
 }
 
 function getRandomUserAgent() {
