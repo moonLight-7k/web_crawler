@@ -1,4 +1,4 @@
-# Web Miner
+# ⛏️ Web Miner
 
 ## Overview
 
@@ -44,13 +44,11 @@ git clone https://github.com/moonLight-7k/web_crawler.git
 #### Usage
 
 ##### to crawl the site
-
-```bash
+````bash
 node main.js <website>
 ```
 
 ##### to see help
-
-```bash
+````bash
 node main.js help
 ```
