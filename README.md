@@ -1,4 +1,4 @@
-# ⛏️ Web Miner
+ # ⛏️ Web Miner
 
 ## Overview
 
@@ -37,16 +37,16 @@ The Web Miner is a versatile JavaScript tool designed to fetch data from website
 
 (Note: [Node.js](https://nodejs.org/en) should be installed )
 
-```bash
+````bash
 git clone https://github.com/moonLight-7k/web_crawler.git
-```
+````
 
 #### Usage
 
 ##### to crawl the site
 ````bash
 node main.js <website>
-```
+````
 
 ##### to see help
 ````bash
