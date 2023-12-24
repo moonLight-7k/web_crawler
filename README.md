@@ -48,7 +48,3 @@ git clone https://github.com/moonLight-7k/web_crawler.git
 node main.js <website>
 ````
 
-##### see help
-````bash
-node main.js help
-````
