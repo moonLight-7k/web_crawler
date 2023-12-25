@@ -8,13 +8,14 @@
     "test": "jest"
   },
   "keywords": [],
-  "author": "",
+  "author": "moon",
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.7.0"
   },
   "dependencies": {
     "jsdom": "^23.0.1",
+    "mongodb": "^6.3.0",
     "node-fetch": "^2.7.0",
     "puppeteer": "^21.6.1"
   }

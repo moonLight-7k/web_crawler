@@ -1,8 +1,7 @@
 const { JSDOM } = require("jsdom");
-const fetch = require("node-fetch");
-const path = require("path");
 const fs = require("fs").promises;
 const puppeteer = require("puppeteer");
+const { MongoClient } = require("mongodb");
 
 // List of common user-agents
 const userAgents = [
@@ -37,22 +36,9 @@ async function crawlPage(baseURL, currentURL, visitedPages = {}) {
   try {
     const htmlBody = await fetchWithPuppeteer(currentURL); // Use Puppeteer for fetching
 
-    // =====To get info for specific tag from the site=====
-
-    // const extractedContent = extractTextFromTags(htmlBody, [
-    //   "h1",
-    //   "h2",
-    //   "h3",
-    //   "h4",
-    //   "h5",
-    //   "p",
-    //   "a",
-    //   "div",
-    //   "span",
-    // ]);
-
+    //Saving the data
     const allURLs = getURLsFromHTML(htmlBody, baseURL);
-    await saveToJsonFile(`./data/${baseURLObj.hostname}_${n++}.json`, allURLs);
+    await saveToMongoDB(`${baseURLObj.hostname}`, allURLs); // Replace with your actual collection name
 
     const nextURLs = getURLsFromHTML(htmlBody, baseURL); // Get all URLs from the HTML body
 
@@ -163,6 +149,23 @@ async function saveToJsonFile(filePath, urls) {
 
 function getRandomUserAgent() {
   return userAgents[Math.floor(Math.random() * userAgents.length)];
+}
+
+// Function to save data in mongoDB
+async function saveToMongoDB(collection, urls) {
+  const client = new MongoClient("mongodb://localhost:27017", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  try {
+    await client.connect();
+    const db = client.db("Test"); // Database Name
+    await db.collection(collection).insertMany(urls.map((url) => ({ url })));
+    console.log(`✓ URLs saved to MongoDB`);
+  } finally {
+    await client.close();
+  }
 }
 
 module.exports = {
